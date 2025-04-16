@@ -111,6 +111,33 @@ git push origin your-username/type/short-description
 
 ---
 
+## 🔄 Keeping Your Branch Updated  
+
+### Merge `development` into your feature branch **daily!**
+
+To avoid merge conflicts and keep your work up to date with the latest changes, **you should merge the `development` branch into your feature branch at least once a day!**.  
+This should be a **daily routine!**:
+
+- ✅ **First thing in the morning**
+- ✅ **Last thing before creating a Pull Request**
+
+**Steps to update your branch:**
+
+```bash
+# Make sure you're on your feature branch
+git checkout your-username/type/short-description
+
+# Fetch the latest changes from remote
+git fetch origin
+
+# Merge development into your current branch
+git merge origin/development
+```
+
+Resolve any conflicts that come up and test your changes to ensure everything still works correctly.
+
+---
+
 ## ✅ Post-PR Workflow  
 
 - **Review Process**: The lead developer or team will review your changes.  
