@@ -1,0 +1,41 @@
+name: Trivy Security Scan (Reusable)
+
+on:
+  workflow_call:
+    inputs:
+      scan_target:
+        description: "Path or directory to scan (default: .)"
+        required: false
+        type: string
+        default: "."
+
+jobs:
+  trivy_scan:
+    name: Trivy Filesystem Scan
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v5
+
+      - name: Run Trivy Filesystem Scan
+        id: trivy
+        uses: aquasecurity/trivy-action@0.20.0
+        with:
+          scan-type: fs
+          scan-ref: ${{ inputs.scan_target }}
+          ignore-unfixed: true
+          format: table
+          output: trivy-report.txt
+          vuln-type: os,library,secret
+          exit-code: 0           # soft mode – will not fail the job
+          severity: HIGH,CRITICAL
+
+      - name: Upload Trivy Report
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: trivy-scan-report
+          path: trivy-report.txt
