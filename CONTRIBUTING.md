@@ -2,49 +2,8 @@
 
 This guide outlines the collaborative workflow for contributing to this repository. Follow these steps to ensure smooth collaboration and code integration.  
 
----
-
-## 📛 Naming Conventions (Branches & Commits)  
-
-### **Branch Names**  
-Follow the format:  
-`<username>/<type>/<short-description>`  
-
-**Examples:**  
-```bash  
-git checkout -b jakob/feat/user-auth      # Feature branch  
-git checkout -b lena/fix/header-overflow  # Bug fix branch  
-git checkout -b max/docs/contributing     # Documentation update  
-```  
-
-**Accepted Types:**  
-- `feat/`: New features or functionality.  
-- `fix/`: Bug fixes or patches.  
-- `docs/`: Documentation changes.  
-- `chore/`: Maintenance tasks (e.g., CI/CD, dependency updates).  
-- `test/`: Adding or updating tests.  
-- `refactor/`: Code restructuring (no new features/fixes).  
-
-**Rules:**  
-- Always Branch from the **development** branch!  
-- Only use lower case letters.  
-- Try holding the Branchnames short and descriptiv.  
----
-
-### **Commit Messages**  
-`<type>(<scope>): <subject>`  
-
-**Examples:**  
-```bash  
-git commit -m "feat(auth): add OAuth2 login support"  
-git commit -m "fix(header): resolve mobile overflow"  
-git commit -m "docs(readme): update contribution guide"  
-```  
-
-**Rules:**  
-- Use the **imperative mood** ("add" instead of "added").  
-- Try to keep the subject line under **50 characters**.  
-
+For our naming conventions and commit-/ branch-rules please check out:
+[![GIT_GUIDELINES](https://img.shields.io/badge/GIT-Guidelines-blue.svg)](GIT_GUIDELINES.md)
 ---
 
 ## 🛠️ Getting Started  
@@ -99,15 +58,7 @@ git push origin your-username/type/short-description
 
 1. Navigate to the repository on GitHub (the main repo if you’re internal, or your fork if external).  
 2. Click **"Compare & pull request"** for your newly pushed branch.  
-3. Provide a **clear title** and **detailed description** explaining:  
-   - The purpose of your changes.  
-   - Any issues or features addressed.  
-   - Additional context for reviewers.  
-
-### 🔍 PR Best Practices  
-- **Keep PRs focused**: Address one feature/bug per pull request.  
-- **Tag relevant reviewers**: Use `@mentions` to notify team members.  
-- **Respond to feedback**: Discuss suggestions in the PR’s comment section.  
+3. Provide a **clear title** and **detailed description** (see [![GIT_GUIDELINES](https://img.shields.io/badge/GIT-Guidelines-blue.svg)](GIT_GUIDELINES.md) for more details)
 
 ---
 
@@ -142,8 +93,7 @@ Resolve any conflicts that come up and test your changes to ensure everything st
 
 - **Review Process**: The lead developer or team will review your changes.  
 - **Resolve Feedback**: Update your branch if revisions are requested.  
-- **Merge or Close**: Once approved, the PR will be merged into main by the lead developer or maintainers. If the changes are deemed unnecessary, it may be closed.  
-
+- **Merge or Close**: Once approved, the PR will be merged and the branch should be removed afterwards.
 ---
 
 ## 🧹 Branch Cleanup Best Practices  
@@ -159,7 +109,6 @@ Resolve any conflicts that come up and test your changes to ensure everything st
 2. **Exceptions (When to Keep Branches):**  
    - 🌿 **Long-term branches**: E.g., `dev`, `staging`, or version-specific branches like `v2.0`.  
    - 🛠️ **Ongoing work**: Branches tied to multi-PR features still in progress.  
-   - 🏷️ **Tagged releases**: Branches associated with specific releases (e.g., `release-1.3.0`).  
 
 ---
 
@@ -183,15 +132,10 @@ git push origin --delete branch_name
 
 ## 💡 Tips for Effective Collaboration  
 
-- **Sync Frequently**: Regularly pull the latest `main` branch to avoid conflicts:  
-  ```bash  
-  git checkout main  
-  git pull origin main  
-  ```  
 - **Write Clear Commit Messages**: Explain the **why**, not just the *what*.  
 - **Test Locally**: Verify changes work before submitting a PR.  
 
 ---
 
 **Happy Coding!** 🎉  
-Let’s build something amazing together. For advanced workflows, refer to [GitHub’s Collaboration Guide](https://docs.github.com/en/get-started/quickstart/github-flow).  
+Let’s build something amazing together.
