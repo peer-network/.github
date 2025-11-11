@@ -3,7 +3,8 @@
 This guide outlines the collaborative workflow for contributing to this repository. Follow these steps to ensure smooth collaboration and code integration.  
 
 For our naming conventions and commit-/ branch-rules please check out:
-[![GIT_GUIDELINES](https://img.shields.io/badge/GIT-Guidelines-blue.svg)](GIT_GUIDELINES.md)
+[![GIT_GUIDELINES](https://img.shields.io/badge/GIT-Guidelines-blue.svg)](https://github.com/peer-network/.github/blob/main/GIT_GUIDELINES.md)
+
 ---
 
 ## 🛠️ Getting Started  
