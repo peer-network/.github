@@ -15,6 +15,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    outputs:
+      has_findings: ${{ steps.check.outputs.has_findings }}
 
     steps:
       - name: Checkout Source
@@ -32,6 +34,15 @@ jobs:
           vuln-type: os,library,secret
           exit-code: 0           # soft mode – will not fail the job
           severity: HIGH,CRITICAL
+
+      - name: Check for HIGH/CRITICAL Vulnerabilities
+        id: check
+        run: |
+          if grep -q "CRITICAL" trivy-report.txt || grep -q "HIGH" trivy-report.txt; then
+            echo "has_findings=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_findings=false" >> $GITHUB_OUTPUT
+          fi
 
       - name: Upload Trivy Report
         if: always()
