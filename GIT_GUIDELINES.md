@@ -54,7 +54,7 @@ For some more guidelines about how to use Git (commands) refer to this page:
 
 ## Commit Policy
 
-- Commit **small-ish, focused changes**.
+- Commit **small-ish, focused changes multiple times a day**.
 - **Commit only to short‑lived branches** (never directly to `main` or `development`).
 - Use **clear, short subjects** in imperative mood.
 - **Daily safety snapshot**: at **end of your workday**, add a final commit labeled **WIP** to store progress.
@@ -74,7 +74,7 @@ feat(auth): add OAuth2 login
 fix(header): resolve mobile overflow
 docs(readme): clarify setup steps
 chore: update CI cache key
-chore: WIP — end of day snapshot (2025-11-11)
+chore: WIP — end of day snapshot
 ```
 
 > Keep subjects ≲ 50 chars; explain the **why** in the body when helpful.
