@@ -98,15 +98,32 @@ chore: WIP — end of day snapshot
 
 ### Minimal PR template
 ```
-## Summary
-Short explanation of the change.
+## Context
+<!-- WHY: product/user rationale, background, goals. Keep to ~3–6 sentences. -->
 
-## Impact / Risks
-- ...
+
+
+## Description
+<!-- HOW: implementation summary. Mention service integrations, jobs/cron, data/schema changes,
+     feature flags, migrations, rollout/rollback steps. -->
+
+
+
+## Changes in the codebase (optional)
+<!-- Reusable snippets, new utilities, notable patterns. Link to files/lines if helpful. -->
+
+
+
+## Additional information
+<!-- Performance considerations, trade-offs, edge cases, limitations. -->
+
+
 
 ## Links
-- ClickUp: [Task ID or URL]
-- ... (additional important/helpfull links)
+<!-- Tickets and docs -->
+- ClickUp:
+- Additional:
+
 ```
 
 
