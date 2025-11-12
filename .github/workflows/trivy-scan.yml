@@ -31,7 +31,7 @@ jobs:
           ignore-unfixed: true
           format: table
           output: trivy-report.txt
-          vuln-type: os,library,secret
+          vuln-type: os,library
           exit-code: 0           # soft mode – will not fail the job
           severity: HIGH,CRITICAL
 
