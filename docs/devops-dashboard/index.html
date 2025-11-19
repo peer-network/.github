@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Peer Network — DevOps Dashboard</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<h1>Peer Network — DevOps Dashboard</h1>
+
+<section id="loading">Loading data...</section>
+
+<section id="dashboard" style="display:none;">
+    <div class="card">
+        <h2>Total Open PRs</h2>
+        <div id="open-prs">--</div>
+    </div>
+
+    <div class="card">
+        <h2>Failed CI Runs (last 7 days)</h2>
+        <div id="ci-failures">--</div>
+    </div>
+
+    <div class="card">
+        <h2>Last Gitleaks Run</h2>
+        <div id="gitleaks-run">--</div>
+    </div>
+
+    <div class="card">
+        <h2>Last Trivy Run</h2>
+        <div id="trivy-run">--</div>
+    </div>
+
+    <div class="card">
+        <h2>Repo Health Score</h2>
+        <div id="health-score">--</div>
+    </div>
+</section>
+
+<script src="dashboard.js"></script>
+</body>
+</html>
