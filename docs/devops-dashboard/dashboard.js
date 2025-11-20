@@ -47,7 +47,7 @@ async function loadDashboard() {
         "peer-network/peer_ios_frontend",
         "peer-network/peer_rust_backend",
         "peer-network/peer_cd",
-        "peer-network/peer_ansible",
+        "peer-network/peer-ansible",
         "peer-network/.github",
     ];
 
