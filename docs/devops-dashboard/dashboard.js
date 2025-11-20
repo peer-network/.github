@@ -1,3 +1,9 @@
+const PROXY = "https://peer-devops-proxy.wisdom-nwaiwu-peer-b40.workers.dev";
+
+function gh(url) {
+    return `${PROXY}?url=${encodeURIComponent(url)}`;
+}
+
 function badge(color, text) {
     const icon =
         color === "green" ? "🟩" :
@@ -71,14 +77,18 @@ async function loadDashboard() {
         };
 
         // --- OPEN PRs ---
-        const prs = await fetchJSON(`https://api.github.com/repos/${repo}/pulls?state=open`);
+        const prs = await fetchJSON(
+            gh(`https://api.github.com/repos/${repo}/pulls?state=open`)
+        );
         if (prs) {
             info.openPRs = prs.length;
             totalOpenPRs += prs.length;
         }
 
         // --- CI RUNS ---
-        const runs = await fetchJSON(`https://api.github.com/repos/${repo}/actions/runs?per_page=30`);
+        const runs = await fetchJSON(
+            gh(`https://api.github.com/repos/${repo}/actions/runs?per_page=30`)
+        );
         if (runs?.workflow_runs) {
 
             const workflowRuns = runs.workflow_runs;
