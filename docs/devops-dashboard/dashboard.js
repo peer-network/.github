@@ -1,5 +1,10 @@
 function badge(color, text) {
-    return `<span class="badge ${color}">${text}</span>`;
+    const icon =
+        color === "green" ? "🟩" :
+        color === "yellow" ? "🟨" :
+        "🟥";
+
+    return `<span class="badge ${color}">${icon} ${text}</span>`;
 }
 
 function computeHealth({ openPRs, failures, gitleaks, trivy, lastCI }) {
@@ -126,12 +131,13 @@ async function loadDashboard() {
         // --- Add row to table ---
         tableBody.innerHTML += `
             <tr>
-                <td>${repo}</td>
+                <td><a href="https://github.com/${repo}" target="_blank">${repo}</a></td>
                 <td>${info.openPRs}</td>
                 <td>${info.gitleaks ? new Date(info.gitleaks).toLocaleString() : badge("red","None")}</td>
                 <td>${info.trivy ? new Date(info.trivy).toLocaleString() : badge("red","None")}</td>
                 <td>${info.lastCI ? new Date(info.lastCI).toLocaleString() : "—"}</td>
                 <td>${badge(color, score)}</td>
+                <td><a href="https://github.com/${repo}/actions" target="_blank">🔗 View Actions</a></td>
             </tr>
         `;
     }
