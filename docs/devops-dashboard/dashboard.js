@@ -47,7 +47,7 @@ async function loadDashboard() {
         "peer-network/peer_ios_frontend",
         "peer-network/peer_rust_backend",
         "peer-network/peer_cd",
-        "peer-network/peer_ansible",
+        "peer-network/peer-ansible",
         "peer-network/.github",
     ];
 
@@ -142,18 +142,10 @@ async function loadDashboard() {
         `;
     }
 
-
     // Update dashboard
     document.getElementById("open-prs").innerText = totalOpenPRs;
     document.getElementById("ci-failures").innerText = totalFailures;
-
-    // Placeholder values
-    document.getElementById("gitleaks-run").innerText =
-        lastGitleaksDate ? lastGitleaksDate.toLocaleString() : "No runs found";
-
-    document.getElementById("trivy-run").innerText =
-        lastTrivyDate ? lastTrivyDate.toLocaleString() : "No runs found";
-    document.getElementById("health-score").innerText = Math.round(totalFailures === 0 ? 90 : 70);
+    document.getElementById("health-score").innerText = "—"; // placeholder for now
 
     // Show UI
     document.getElementById("loading").style.display = "none";
