@@ -43,6 +43,19 @@ async function fetchJSON(url) {
     }
 }
 
+async function findJob(repo, runId, keyword) {
+    const jobs = await fetchJSON(
+        gh(`https://api.github.com/repos/${repo}/actions/runs/${runId}/jobs`)
+    );
+    if (!jobs?.jobs) return null;
+
+    const job = jobs.jobs.find(j =>
+        JSON.stringify(j).toLowerCase().includes(keyword)
+    );
+
+    return job ? job.started_at : null;
+}
+
 async function loadDashboard() {
     document.getElementById("loading").style.display = "block";
 
@@ -103,19 +116,20 @@ async function loadDashboard() {
                 info.lastCI = workflowRuns[0].created_at;
             }
 
-            // gitleaks
-            const gRun = workflowRuns.find(r =>
-                r.name?.toLowerCase().includes("gitleaks") ||
-                r.display_title?.toLowerCase().includes("gitleaks")
-            );
-            info.gitleaks = gRun?.created_at || null;
+            if (workflowRuns.length > 0) {
+                for (const run of workflowRuns) {
+                    const runId = run.id;
 
-            // trivy
-            const tRun = workflowRuns.find(r =>
-                r.name?.toLowerCase().includes("trivy") ||
-                r.display_title?.toLowerCase().includes("trivy")
-            );
-            info.trivy = tRun?.created_at || null;
+                    const g = await findJob(repo, runId, "gitleaks");
+                    if (g && !info.gitleaks) info.gitleaks = g;
+
+                    const t = await findJob(repo, runId, "trivy");
+                    if (t && !info.trivy) info.trivy = t;
+
+                    // Done early if both found
+                    if (info.gitleaks && info.trivy) break;
+                }
+            }
 
             // --- Track org-wide latest Gitleaks run ---
             if (info.gitleaks) {
