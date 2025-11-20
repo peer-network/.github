@@ -70,3 +70,16 @@ table tr:hover {
 .badge.red {
     background-color: #e74c3c;
 }
+
+/* ---------- NAVIGATION LINK ---------- */
+
+.nav-link {
+    font-size: 16px;
+    font-weight: bold;
+    text-decoration: none;
+    color: #0077cc;
+}
+
+.nav-link:hover {
+    text-decoration: underline;
+}
