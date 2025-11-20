@@ -21,3 +21,52 @@ h1 {
   margin-top: 0;
 }
 
+/* ---------- TABLE ---------- */
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 0 8px rgba(0,0,0,0.1);
+}
+
+table th, table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+table th {
+    background: #fafafa;
+    font-weight: bold;
+}
+
+table tr:hover {
+    background: #f9f9f9;
+}
+
+/* ---------- BADGES ---------- */
+
+.badge {
+    padding: 4px 8px;
+    border-radius: 6px;
+    color: white;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+.badge.green {
+    background-color: #2ecc71;
+}
+
+.badge.yellow {
+    background-color: #f1c40f;
+    color: black;
+}
+
+.badge.red {
+    background-color: #e74c3c;
+}
