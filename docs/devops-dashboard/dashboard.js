@@ -1,5 +1,8 @@
 const PROXY = "https://peer-devops-proxy.wisdom-nwaiwu-peer-b40.workers.dev";
 
+let lastGitleaksDate = null;
+let lastTrivyDate = null;
+
 function gh(url) {
     return `${PROXY}?url=${encodeURIComponent(url)}`;
 }
@@ -72,8 +75,8 @@ async function loadDashboard() {
 
     let totalOpenPRs = 0;
     let totalFailures = 0;
-    let lastGitleaksDate = null;
-    let lastTrivyDate = null;
+
+    const repoInfos = [];
 
     const tableBody = document.querySelector("#repo-table tbody");
 
@@ -152,24 +155,50 @@ async function loadDashboard() {
         const score = computeHealth(info);
         const color = score > 75 ? "green" : score > 50 ? "yellow" : "red";
 
-        // --- Add row to table ---
-        tableBody.innerHTML += `
+        repoInfos.push(info);
+
+    }
+
+    // --- Build table once, after collecting repoInfos ---
+    let rows = "";
+
+    for (const info of repoInfos) {
+        const score = computeHealth(info);
+        const color = score > 75 ? "green" : score > 50 ? "yellow" : "red";
+
+        rows += `
             <tr>
-                <td><a href="https://github.com/${repo}" target="_blank">${repo}</a></td>
+                <td><a href="https://github.com/${info.repo}" target="_blank">${info.repo}</a></td>
                 <td>${info.openPRs}</td>
                 <td>${info.gitleaks ? new Date(info.gitleaks).toLocaleString() : badge("red","None")}</td>
                 <td>${info.trivy ? new Date(info.trivy).toLocaleString() : badge("red","None")}</td>
                 <td>${info.lastCI ? new Date(info.lastCI).toLocaleString() : "—"}</td>
                 <td>${badge(color, score)}</td>
-                <td><a href="https://github.com/${repo}/actions" target="_blank">🔗 View Actions</a></td>
+                <td><a href="https://github.com/${info.repo}/actions" target="_blank">🔗 View Actions</a></td>
             </tr>
         `;
     }
 
+    document.querySelector("#repo-table tbody").innerHTML = rows;
+
+
+    // --- Compute overall org health ---
+    let totalScore = 0;
+    let repoCount = repos.length;
+
+    for (const info of repoInfos) {
+        totalScore += computeHealth(info);
+    }
+
+    // Average health score for the org
+    const orgScore = Math.round(totalScore / repoCount);
+    const orgColor = orgScore > 75 ? "green" : orgScore > 50 ? "yellow" : "red";
+
+    document.getElementById("health-score").innerHTML = badge(orgColor, orgScore);
+
     // Update dashboard
     document.getElementById("open-prs").innerText = totalOpenPRs;
     document.getElementById("ci-failures").innerText = totalFailures;
-    document.getElementById("health-score").innerText = "—"; // placeholder for now
 
     // Show UI
     document.getElementById("loading").style.display = "none";
