@@ -83,3 +83,38 @@ table tr:hover {
 .nav-link:hover {
     text-decoration: underline;
 }
+
+/* ---------- DETAILS ---------- */
+
+.details-btn {
+    margin-top: 8px;
+    padding: 4px 8px;
+    font-size: 12px;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    background: #f7f7f7;
+    border-radius: 6px;
+}
+
+.details-btn:hover {
+    background: #eee;
+}
+
+.details-row {
+    background: #fafafa;
+}
+
+.details-content {
+    padding: 10px 20px;
+    font-size: 14px;
+    border-left: 3px solid #0077cc;
+}
+
+/* ---------- ORGANIZATION DETAILS ---------- */
+.org-details {
+    padding: 10px 20px;
+    background: #fafafa;
+    border-left: 4px solid #0077cc;
+    margin-top: 8px;
+    font-size: 14px;
+}
