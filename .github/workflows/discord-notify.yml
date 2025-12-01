@@ -1,0 +1,112 @@
+name: "Reusable Discord Notifications"
+
+on:
+  workflow_call:
+    inputs:
+      repo_name:
+        description: "Name of the repository sending this notification"
+        required: true
+        type: string
+
+      event_type:
+        description: "Notification type (behind, gitleaks_failed, trivy_vulnerabilities, build_failed, success)"
+        required: true
+        type: string
+
+      pr_title:
+        description: "Pull request title"
+        required: true
+        type: string
+
+      pr_url:
+        description: "Pull request URL"
+        required: true
+        type: string
+
+      run_url:
+        description: "GitHub Actions run URL"
+        required: true
+        type: string
+
+      discord_mention:
+        description: "Discord mention (<@ID>)"
+        required: true
+        type: string
+
+    secrets:
+      webhook:
+        required: true
+
+jobs:
+  send_notification:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Build message
+        id: build
+        run: |
+          case "${{ inputs.event_type }}" in
+
+            behind)
+              MESSAGE=":warning: **${{ inputs.repo_name }} PR Branch is Behind the Base Branch**"
+              MESSAGE+="\n\n**PR:** ${{ inputs.pr_title }}"
+              MESSAGE+="\nLink: <${{ inputs.pr_url }}>"
+              MESSAGE+="\nAuthor: ${{ inputs.discord_mention }}"
+              MESSAGE+="\n\nPlease update your branch with the latest changes from the base branch before continuing."
+              ;;
+
+            gitleaks_failed)
+              MESSAGE=":x: **${{ inputs.repo_name }} Gitleaks Scan Failed!**"
+              MESSAGE+="\n\n**PR:** ${{ inputs.pr_title }}"
+              MESSAGE+="\nPR Link: <${{ inputs.pr_url }}>"
+              MESSAGE+="\nCI Run: <${{ inputs.run_url }}>"
+              MESSAGE+="\nAuthor: ${{ inputs.discord_mention }}"
+              MESSAGE+="\n\n:warning: **Secrets were detected by Gitleaks.**"
+              MESSAGE+="\nDownload the **gitleaks-report** artifact in the Actions run to review details."
+              MESSAGE+="\nRun \`make scan\` locally to reproduce."
+              MESSAGE+="\n\n:no_entry: **Do NOT bypass with \`--no-verify\`. CI will still block your PR.**"
+              MESSAGE+="\nIf this is a false positive, contact **Team Lead / CTO / DevOps**."
+              ;;
+
+            trivy_vulnerabilities)
+              MESSAGE=":warning: **Critical Trivy Vulnerabilities Detected in ${{ inputs.repo_name }}!**"
+              MESSAGE+="\n\n**PR:** ${{ inputs.pr_title }}"
+              MESSAGE+="\nLink: <${{ inputs.pr_url }}>"
+              MESSAGE+="\nRun: <${{ inputs.run_url }}>"
+              MESSAGE+="\nAuthor: ${{ inputs.discord_mention }}"
+              MESSAGE+="\n\nTrivy reported **HIGH or CRITICAL vulnerabilities or secrets**."
+              MESSAGE+="\nReview the Trivy report artifact immediately before merging."
+              ;;
+
+            build_failed)
+              MESSAGE=":x: **${{ inputs.repo_name }} Build or Tests Failed**"
+              MESSAGE+="\n\n**PR:** ${{ inputs.pr_title }}"
+              MESSAGE+="\nPR Link: <${{ inputs.pr_url }}>"
+              MESSAGE+="\nRun: <${{ inputs.run_url }}>"
+              MESSAGE+="\nAuthor: ${{ inputs.discord_mention }}"
+              MESSAGE+="\n\nYour CI build or tests did not pass. Please check logs and fix issues."
+              ;;
+
+            success)
+              MESSAGE=":white_check_mark: **${{ inputs.repo_name }} CI Passed Successfully!**"
+              MESSAGE+="\n\n**PR:** ${{ inputs.pr_title }}"
+              MESSAGE+="\nPR Link: <${{ inputs.pr_url }}>"
+              MESSAGE+="\nCI Run: <${{ inputs.run_url }}>"
+              MESSAGE+="\n\nAll checks passed successfully. Great work ${{ inputs.discord_mention }} 🎉"
+              ;;
+
+            *)
+              MESSAGE="Unknown event type."
+              ;;
+          esac
+
+          echo "message<<EOF" >> $GITHUB_OUTPUT
+          echo "$MESSAGE" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Send Discord message
+        run: |
+          curl -H "Content-Type: application/json" \
+               -X POST \
+               -d "{\"content\": \"${{ steps.build.outputs.message }}\"}" \
+               "${{ secrets.webhook }}"
