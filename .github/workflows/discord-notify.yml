@@ -42,9 +42,29 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Determine Team Lead
+        id: teamlead
+        run: |
+          case "${{ inputs.repo_name }}" in
+            "Web Frontend")
+              echo "lead=<@1367037547011641407>" >> $GITHUB_OUTPUT
+              ;;
+            "Android Frontend")
+              echo "lead=<@1354048093376610366>" >> $GITHUB_OUTPUT
+              ;;
+            "iOS Frontend")
+              echo "lead=<@310723093863858176>" >> $GITHUB_OUTPUT
+              ;;
+            *)
+              echo "lead=" >> $GITHUB_OUTPUT
+              ;;
+          esac
+
       - name: Build message
         id: build
         run: |
+          LEAD="${{ steps.teamlead.outputs.lead }}"
+
           case "${{ inputs.event_type }}" in
 
             behind)
@@ -92,7 +112,14 @@ jobs:
               MESSAGE+="\n\n**PR:** ${{ inputs.pr_title }}"
               MESSAGE+="\nPR Link: <${{ inputs.pr_url }}>"
               MESSAGE+="\nCI Run: <${{ inputs.run_url }}>"
-              MESSAGE+="\n\nAll checks passed successfully. Great work ${{ inputs.discord_mention }} 🎉"
+              MESSAGE+="\n\nAll checks passed successfully."
+
+              # Append team lead if available
+              if [ -n "$LEAD" ]; then
+                MESSAGE+=" $LEAD"
+              else
+                MESSAGE+=" Great work ${{ inputs.discord_mention }}"
+              fi
               ;;
 
             *)
