@@ -1,0 +1,86 @@
+name: Auto-Label PR
+
+on:
+  workflow_call:
+    inputs:
+      label_config:
+        description: "JSON map of patterns to labels"
+        type: string
+        required: true
+      mode:
+        description: "soft or hard"
+        type: string
+        default: "soft"
+    secrets:
+      GH_TOKEN:
+        required: true
+
+jobs:
+  autolabel:
+    name: Apply Auto-Labels
+    runs-on: ubuntu-latest
+
+    permissions:
+      pull-requests: write
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Get changed files
+        id: changed
+        uses: tj-actions/changed-files@v45
+        with:
+          separator: ","
+
+      - name: Parse config
+        id: cfg
+        run: |
+          echo "config<<EOF" >> $GITHUB_OUTPUT
+          echo '${{ inputs.label_config }}' | jq '.' >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Match patterns
+        id: match
+        run: |
+          files="${{ steps.changed.outputs.all_modified_files }}"
+          echo "Changed files: $files"
+
+          labels=()
+
+          # loop through config
+          for pattern in $(echo "${{ steps.cfg.outputs.config }}" | jq -r 'keys[]'); do
+            label=$(echo "${{ steps.cfg.outputs.config }}" | jq -r --arg p "$pattern" '.[$p]')
+
+            echo "$files" | tr "," "\n" | grep -E "$pattern" >/dev/null 2>&1
+            if [ $? -eq 0 ]; then
+              echo "Matched $pattern → $label"
+              labels+=("$label")
+            fi
+          done
+
+          printf '%s\n' "${labels[@]}" | jq -R . | jq -s . | tee labels.json
+          echo "labels=$(cat labels.json)" >> $GITHUB_OUTPUT
+
+      - name: Apply labels
+        if: steps.match.outputs.labels != '[]'
+        uses: actions/github-script@v8
+        with:
+          github-token: ${{ secrets.GH_TOKEN }}
+          script: |
+            const labels = ${{ steps.match.outputs.labels }};
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              labels,
+            });
+
+      - name: Hard mode check
+        if: inputs.mode == 'hard'
+        run: |
+          if [[ "${{ steps.match.outputs.labels }}" == "[]" ]]; then
+            echo "::error ::Hard mode enabled but no labels matched."
+            exit 1
+          fi
