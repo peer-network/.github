@@ -1,5 +1,9 @@
 name: Auto Update PR Branch
 
+permissions:
+  contents: write
+  pull-requests: write
+
 on:
   workflow_call:
     inputs:
@@ -11,10 +15,6 @@ jobs:
   auto_update:
     name: Auto-update PR if behind
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pull-requests: write
-
     steps:
       - name: Install jq
         run: sudo apt-get update && sudo apt-get install -y jq
