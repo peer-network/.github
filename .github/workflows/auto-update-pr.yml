@@ -1,0 +1,77 @@
+name: Auto Update PR Branch
+
+on:
+  workflow_call:
+    inputs:
+      pull_request:
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  auto_update:
+    name: Auto-update PR if behind
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Checkout repo
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Extract PR info
+        id: refs
+        run: |
+          PR='${{ inputs.pull_request }}'
+          echo "base=$(echo "$PR" | jq -r '.base.ref')" >> $GITHUB_OUTPUT
+          echo "head=$(echo "$PR" | jq -r '.head.ref')" >> $GITHUB_OUTPUT
+          echo "number=$(echo "$PR" | jq -r '.number')" >> $GITHUB_OUTPUT
+
+      - name: Fetch all refs
+        run: git fetch origin
+
+      - name: Check if branch is behind
+        id: behind
+        run: |
+          BASE=${{ steps.refs.outputs.base }}
+          HEAD=${{ steps.refs.outputs.head }}
+          BEHIND=$(git rev-list --left-right --count origin/$HEAD...origin/$BASE | awk '{print $2}')
+          echo "behind=$BEHIND" >> $GITHUB_OUTPUT
+
+      - name: Stop if up to date
+        if: steps.behind.outputs.behind == '0'
+        run: echo "Branch is up to date."
+
+      - name: Try merge (check conflicts)
+        id: mergecheck
+        if: steps.behind.outputs.behind != '0'
+        run: |
+          BASE=${{ steps.refs.outputs.base }}
+          HEAD=${{ steps.refs.outputs.head }}
+
+          git config user.email "github-actions@github.com"
+          git config user.name "github-actions"
+
+          git checkout $HEAD
+
+          if git merge origin/$BASE --no-commit; then
+            echo "conflict=false" >> $GITHUB_OUTPUT
+          else
+            echo "conflict=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Stop on conflicting merge
+        if: ${{ steps.mergecheck.outputs.conflict == 'true' }}
+        run: echo "Merge conflict detected — cannot auto-update."
+
+      - name: Commit and push merge
+        if: ${{ steps.mergecheck.outputs.conflict == 'false' }}
+        run: |
+          git commit -m "Auto-update branch from ${{ steps.refs.outputs.base }}"
+          git push origin HEAD
