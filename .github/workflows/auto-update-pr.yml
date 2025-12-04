@@ -27,10 +27,10 @@ jobs:
       - name: Extract PR info
         id: refs
         run: |
-          PR='${{ inputs.pull_request }}'
-          echo "base=$(echo "$PR" | jq -r '.base.ref')" >> $GITHUB_OUTPUT
-          echo "head=$(echo "$PR" | jq -r '.head.ref')" >> $GITHUB_OUTPUT
-          echo "number=$(echo "$PR" | jq -r '.number')" >> $GITHUB_OUTPUT
+          echo '${{ inputs.pull_request }}' > pr.json
+          echo "base=$(jq -r '.base.ref' pr.json)" >> $GITHUB_OUTPUT
+          echo "head=$(jq -r '.head.ref' pr.json)" >> $GITHUB_OUTPUT
+          echo "number=$(jq -r '.number' pr.json)" >> $GITHUB_OUTPUT
 
       - name: Fetch all refs
         run: git fetch origin
