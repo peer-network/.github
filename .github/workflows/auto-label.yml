@@ -37,7 +37,7 @@ jobs:
       - name: Parse config
         id: cfg
         run: |
-          printf "%s\n" "${{ inputs.label_config }}" > config.json
+          echo "${{ inputs.label_config }}" > config.json
           jq . config.json > parsed.json
           echo "config=$(cat parsed.json)" >> $GITHUB_OUTPUT
 
