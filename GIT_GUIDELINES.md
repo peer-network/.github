@@ -119,6 +119,11 @@ chore: WIP — end of day snapshot
 ### Additional information (optional)
 <!-- Performance considerations, trade-offs, edge cases, limitations. -->
 
+## Pull Request Guide  
+See: [PR_GUIDE.md](./PR_GUIDE.md)
+
+> 📘 Need help? See the full PR guide:  
+> https://github.com/peer-network/.github/blob/main/.github/PR_GUIDE.md
 
 
 ### Links
