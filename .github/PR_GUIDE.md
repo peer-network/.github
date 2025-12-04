@@ -5,8 +5,8 @@ When creating a PR in any Peer repository:
 1. Create a feature branch
 
 Use clear naming:
-username/feat/...
-username/fix/...
+- username/feat/...
+- username/fix/...
 
 2. Commit your changes
 
@@ -16,17 +16,17 @@ Follow the existing commit style if possible.
 3. Open a Pull Request
 
 Choose the correct target branch:
-development — normal work
-pre-release — release preparation
-main — urgent hotfixes
+- development — normal work
+- pre-release — release preparation
+- main — urgent hotfixes
 
 4. Fill out the PR template
 
 Include:
 
-Context
-Implementation summary
-Test notes (if relevant)
+- Context
+- Implementation summary
+- Test notes (if relevant)
 
 🔄 Automatic Branch Update (New Feature)
 
