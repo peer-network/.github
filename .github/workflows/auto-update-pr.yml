@@ -8,7 +8,7 @@ on:
   workflow_call:
     inputs:
       pull_request:
-        required: true
+        required: false
         type: string
 
 jobs:
@@ -24,36 +24,30 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Determine PR JSON (from event or lookup)
-        id: pr
+      - name: Determine refs (PR or non-PR)
+        id: determine
         run: |
-          # If PR JSON passed from caller
+          # CASE 1: Workflow was called from pull_request
           if [ -n "${{ inputs.pull_request }}" ] && [ "${{ inputs.pull_request }}" != "null" ]; then
-            echo "${{ inputs.pull_request }}" | jq -r '.' > pr.json
-            echo "Found PR from workflow_call input."
-          else
-            # No PR was passed → try lookup based on branch name
-            BRANCH="${{ github.ref_name }}"
-            echo "No PR JSON provided. Using branch from GitHub context: $BRANCH"
+            echo "${{ inputs.pull_request }}" > pr.json
 
-            PR_API="https://api.github.com/repos/${{ github.repository }}/pulls?head=${{ github.repository_owner }}:${BRANCH}"
 
-            curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "$PR_API" | jq '.[0]' > pr.json
+            BASE=$(jq -r '.base.ref' pr.json)
+            HEAD=$(jq -r '.head.ref' pr.json)
 
-            if jq -e '.id' pr.json >/dev/null; then
-              echo "PR found via API."
-            else
-              echo "No PR found for this branch — exiting."
-              exit 0
-            fi
+            echo "mode=pr" >> $GITHUB_OUTPUT
+            echo "base=$BASE" >> $GITHUB_OUTPUT
+            echo "head=$HEAD" >> $GITHUB_OUTPUT
+            exit 0
           fi
 
-      - name: Extract PR info
-        id: refs
-        run: |
-          echo "base=$(jq -r '.base.ref' pr.json)" >> $GITHUB_OUTPUT
-          echo "head=$(jq -r '.head.ref' pr.json)" >> $GITHUB_OUTPUT
-          echo "number=$(jq -r '.number' pr.json)" >> $GITHUB_OUTPUT
+          # CASE 2: push / workflow_dispatch / rerun (no PR JSON)
+          CURRENT="${{ github.ref_name }}"
+          DEFAULT="${{ github.event.repository.default_branch }}"
+
+          echo "mode=branch" >> $GITHUB_OUTPUT
+          echo "base=$DEFAULT" >> $GITHUB_OUTPUT
+          echo "head=$CURRENT" >> $GITHUB_OUTPUT
 
       - name: Fetch all refs
         run: git fetch origin
@@ -61,9 +55,9 @@ jobs:
       - name: Check if branch is behind
         id: behind
         run: |
-          BASE=${{ steps.refs.outputs.base }}
-          HEAD=${{ steps.refs.outputs.head }}
-          BEHIND=$(git rev-list --left-right --count origin/$HEAD...origin/$BASE | awk '{print $2}')
+          BASE=${{ steps.determine.outputs.base }}
+          HEAD=${{ steps.determine.outputs.head }}
+          BEHIND=$(git rev-list --left-right --count origin/$BASE...origin/$HEAD | awk '{print $1}')
           echo "behind=$BEHIND" >> $GITHUB_OUTPUT
 
       - name: Stop if up to date
@@ -74,8 +68,8 @@ jobs:
         id: mergecheck
         if: steps.behind.outputs.behind != '0'
         run: |
-          BASE=${{ steps.refs.outputs.base }}
-          HEAD=${{ steps.refs.outputs.head }}
+          BASE=${{ steps.determine.outputs.base }}
+          HEAD=${{ steps.determine.outputs.head }}
 
           git config user.email "github-actions@github.com"
           git config user.name "github-actions"
@@ -96,5 +90,5 @@ jobs:
       - name: Commit and push merge
         if: ${{ steps.mergecheck.outputs.conflict == 'false' }}
         run: |
-          git commit -m "Auto-update branch from ${{ steps.refs.outputs.base }}"
+          git commit -m "Auto-update branch from ${{ steps.determine.outputs.base }}"
           git push origin HEAD
