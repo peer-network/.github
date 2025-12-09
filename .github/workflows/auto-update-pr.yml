@@ -27,7 +27,8 @@ jobs:
       - name: Extract PR info
         id: refs
         run: |
-          echo '${{ inputs.pull_request }}' > pr.json
+          printf '%s' "${{ inputs.pull_request }}" > pr.json
+
           echo "base=$(jq -r '.base.ref' pr.json)" >> $GITHUB_OUTPUT
           echo "head=$(jq -r '.head.ref' pr.json)" >> $GITHUB_OUTPUT
           echo "number=$(jq -r '.number' pr.json)" >> $GITHUB_OUTPUT
@@ -57,6 +58,7 @@ jobs:
           git config user.email "github-actions@github.com"
           git config user.name "github-actions"
 
+          git fetch origin $HEAD:$HEAD || true
           git checkout $HEAD
 
           if git merge origin/$BASE --no-commit; then
