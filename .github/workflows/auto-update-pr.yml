@@ -29,7 +29,7 @@ jobs:
         run: |
           # CASE 1: PR JSON was passed
           if [ -n "${{ inputs.pull_request_json }}" ]; then
-            echo '${{ inputs.pull_request_json }}' > pr.json
+            printf "%s\n" "${{ inputs.pull_request_json }}" > pr.json
 
             BASE=$(jq -r '.base.ref' pr.json)
             HEAD=$(jq -r '.head.ref' pr.json)
