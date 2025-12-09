@@ -7,7 +7,7 @@ permissions:
 on:
   workflow_call:
     inputs:
-      pull_request:
+      pull_request_b64:
         required: false
         type: string
 
@@ -27,14 +27,9 @@ jobs:
       - name: Determine refs (PR or non-PR)
         id: determine
         run: |
-          # CASE 1: Workflow was called from pull_request
-          if [ -n "${{ inputs.pull_request }}" ] && [ "${{ inputs.pull_request }}" != "null" ]; then
-
-            # Encode JSON safely using base64
-            echo "${{ toJson(inputs.pull_request) }}" | base64 -w0 > pr.b64
-
-            # Decode safely into a proper JSON file
-            base64 -d pr.b64 > pr.json
+          # CASE 1: PR JSON was passed
+          if [ -n "${{ inputs.pull_request_b64 }}" ]; then
+            echo "${{ inputs.pull_request_b64 }}" | base64 --decode > pr.json
 
             BASE=$(jq -r '.base.ref' pr.json)
             HEAD=$(jq -r '.head.ref' pr.json)
