@@ -7,7 +7,10 @@ permissions:
 on:
   workflow_call:
     inputs:
-      pull_request_json:
+      pr_base:
+        required: false
+        type: string
+      pr_head:
         required: false
         type: string
 
@@ -27,16 +30,11 @@ jobs:
       - name: Determine refs (PR or non-PR)
         id: determine
         run: |
-          # CASE 1: PR JSON was passed
-          if [ -n "${{ inputs.pull_request_json }}" ]; then
-            printf "%s\n" "${{ inputs.pull_request_json }}" > pr.json
-
-            BASE=$(jq -r '.base.ref' pr.json)
-            HEAD=$(jq -r '.head.ref' pr.json)
-
+          # CASE 1: PR call
+          if [ -n "${{ inputs.pr_base }}" ] && [ -n "${{ inputs.pr_head }}" ]; then
             echo "mode=pr" >> $GITHUB_OUTPUT
-            echo "base=$BASE" >> $GITHUB_OUTPUT
-            echo "head=$HEAD" >> $GITHUB_OUTPUT
+            echo "base=${{ inputs.pr_base }}" >> $GITHUB_OUTPUT
+            echo "head=${{ inputs.pr_head }}" >> $GITHUB_OUTPUT
             exit 0
           fi
 
