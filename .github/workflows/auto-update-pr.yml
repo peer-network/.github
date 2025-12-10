@@ -24,7 +24,7 @@ jobs:
     name: Auto-update PR if behind
     runs-on: ubuntu-latest
     outputs:
-      auto_update_conflict: ${{ steps.mergecheck.outputs.conflict }}
+      auto_update_conflict: ${{ steps.mergecheck.outputs.conflict || steps.mergecheck_default.outputs.conflict }}
       auto_update_status: ${{ steps.status.outputs.status }}
     steps:
       - name: Checkout repo
@@ -67,7 +67,7 @@ jobs:
         run: echo "Branch is up to date."
 
       - name: Default conflict output when up to date
-        id: mergecheck
+        id: mergecheck_default
         if: steps.behind.outputs.behind == '0'
         run: echo "conflict=false" >> $GITHUB_OUTPUT
 
