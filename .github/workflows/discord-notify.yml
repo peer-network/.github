@@ -67,6 +67,16 @@ jobs:
 
           case "${{ inputs.event_type }}" in
 
+            auto_update_conflict)
+              MESSAGE=":warning: **${{ inputs.repo_name }} Auto-Update Failed Due to Merge Conflict**"
+              MESSAGE+="\n\n**PR:** ${{ inputs.pr_title }}"
+              MESSAGE+="\nPR Link: <${{ inputs.pr_url }}>"
+              MESSAGE+="\nCI Run: <${{ inputs.run_url }}>"
+              MESSAGE+="\nAuthor: ${{ inputs.discord_mention }}"
+              MESSAGE+="\nYou can resolve the conflicts **locally** or use GitHub's **Resolve conflicts** button."
+              MESSAGE+="\nAfter fixing the conflicts, push or commit the changes and the CI will retry automatically."
+              ;;
+
             behind)
               MESSAGE=":warning: **${{ inputs.repo_name }} PR Branch is Behind the Base Branch**"
               MESSAGE+="\n\n**PR:** ${{ inputs.pr_title }}"
