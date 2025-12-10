@@ -1,0 +1,47 @@
+name: Check Branch Sync
+
+on:
+  workflow_call:
+    inputs:
+      base_branch:
+        required: true
+        type: string
+      pr_branch:
+        required: true
+        type: string
+
+    outputs:
+      is_behind:
+        value: ${{ jobs.check.outputs.is_behind }}
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      is_behind: ${{ steps.check.outputs.is_behind }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Fetch all branches
+        run: |
+          git fetch origin +refs/heads/*:refs/remotes/origin/*
+
+      - name: Compare PR branch with base
+        id: check
+        run: |
+          base="${{ inputs.base_branch }}"
+          head="${{ inputs.pr_branch }}"
+
+          echo "Comparing $head against $base"
+
+          behind=$(git rev-list --left-right --count origin/$base...origin/$head | awk '{print $1}')
+
+          if [ "$behind" -gt 0 ]; then
+            echo "is_behind=true" >> $GITHUB_OUTPUT
+          else
+            echo "is_behind=false" >> $GITHUB_OUTPUT
+          fi
