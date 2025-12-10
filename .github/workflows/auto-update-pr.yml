@@ -13,11 +13,19 @@ on:
       pr_head:
         required: false
         type: string
+    outputs:
+      auto_update_conflict:
+        value: ${{ jobs.auto_update.outputs.auto_update_conflict }}
+      auto_update_status:
+        value: ${{ jobs.auto_update.outputs.auto_update_status }}
 
 jobs:
   auto_update:
     name: Auto-update PR if behind
     runs-on: ubuntu-latest
+    outputs:
+      auto_update_conflict: ${{ steps.mergecheck.outputs.conflict }}
+      auto_update_status: ${{ steps.status.outputs.status }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v6
@@ -58,6 +66,11 @@ jobs:
         if: steps.behind.outputs.behind == '0'
         run: echo "Branch is up to date."
 
+      - name: Default conflict output when up to date
+        id: mergecheck
+        if: steps.behind.outputs.behind == '0'
+        run: echo "conflict=false" >> $GITHUB_OUTPUT
+
       - name: Try merge (check conflicts)
         id: mergecheck
         if: steps.behind.outputs.behind != '0'
@@ -80,6 +93,15 @@ jobs:
       - name: Stop on conflicting merge
         if: ${{ steps.mergecheck.outputs.conflict == 'true' }}
         run: echo "Merge conflict detected — cannot auto-update."
+
+      - name: Set auto-update status
+        id: status
+        run: |
+          if [ "${{ steps.mergecheck.outputs.conflict }}" == "true" ]; then
+            echo "status=failure" >> $GITHUB_OUTPUT
+          else
+            echo "status=success" >> $GITHUB_OUTPUT
+          fi
 
       - name: Commit and push merge
         if: ${{ steps.mergecheck.outputs.conflict == 'false' }}
