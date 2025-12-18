@@ -43,8 +43,8 @@ jobs:
             exit 1
           }
 
-          jq . config.json > parsed.json
-          echo "config=$(cat parsed.json)" >> $GITHUB_OUTPUT
+          config=$(jq -c . config.json)
+          echo "config=$config" >> "$GITHUB_OUTPUT"
 
       - name: Match patterns
         id: match
@@ -65,8 +65,8 @@ jobs:
             fi
           done
 
-          printf '%s\n' "${labels[@]}" | sort -u | jq -R . | jq -s . | tee labels.json
-          echo "labels=$(cat labels.json)" >> $GITHUB_OUTPUT
+          labels_json=$(printf '%s\n' "${labels[@]}" | sort -u | jq -R . | jq -s -c .)
+          echo "labels=$labels_json" >> "$GITHUB_OUTPUT" 
 
       - name: Apply labels
         if: steps.match.outputs.labels != '[]'
