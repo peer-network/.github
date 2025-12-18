@@ -55,8 +55,8 @@ jobs:
           labels=()
 
           # loop through config
-          for pattern in $(echo "${{ steps.cfg.outputs.config }}" | jq -r 'keys[]'); do
-            label=$(echo "${{ steps.cfg.outputs.config }}" | jq -r --arg p "$pattern" '.[$p]')
+          for pattern in $(jq -r 'keys[]' config.json); do
+            label=$(jq -r --arg p "$pattern" '.[$p]' config.json)
 
             echo "$files" | tr "," "\n" | grep -E "$pattern" >/dev/null 2>&1
             if [ $? -eq 0 ]; then
