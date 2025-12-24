@@ -64,8 +64,17 @@ jobs:
             fi
           done
 
-          labels_json=$(printf '%s\n' "${labels[@]}" | sort -u | jq -R . | jq -s -c .)
-          echo "labels=$labels_json" >> "$GITHUB_OUTPUT" 
+          if [ "${#labels[@]}" -eq 0 ]; then
+            labels_json="[]"
+          else
+            labels_json=$(printf '%s\n' "${labels[@]}" \
+              | sed '/^$/d' \
+              | sort -u \
+              | jq -R . \
+              | jq -s -c .)
+            fi
+
+            echo "labels=$labels_json" >> "$GITHUB_OUTPUT"
 
       - name: Apply labels
         if: steps.match.outputs.labels != '[]'
@@ -73,7 +82,13 @@ jobs:
         with:
           github-token: ${{ secrets.GH_TOKEN }}
           script: |
-            const labels = ${{ steps.match.outputs.labels }};
+            const labels = ${{ steps.match.outputs.labels }}.filter(Boolean);
+
+            if (labels.length === 0) {
+              console.log("No labels to apply — skipping");
+              return;
+            }
+
             await github.rest.issues.addLabels({
               owner: context.repo.owner,
               repo: context.repo.repo,
